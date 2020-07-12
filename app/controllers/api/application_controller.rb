@@ -7,7 +7,9 @@ module Api
 
     def authenticate_request
       @current_api_user = AuthorizeApiRequest.call(request.headers).result
-
+      #      auth_token = Rails.env.test? ? params : request.headers
+      #
+      #       @current_api_user = AuthorizeApiRequest.call(auth_token).result
       unless @current_api_user
         render json: { error: 'This is not a authorized request.' },
                status: :unauthorized
@@ -26,6 +28,11 @@ module Api
         render json: { error: 'This is not a authorized request.' },
                status: :unauthorized
       end
+    end
+
+    def check_params_limit_and_offset
+      @limit = params[:limit].blank? ? 10 : params[:limit].to_s.gsub(/\D/, '').to_i
+      @offset = params[:offset].blank? ? 0 : params[:offset].to_s.gsub(/\D/, '').to_i
     end
   end
 end
